@@ -91,7 +91,8 @@ def train_model(
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
     criterion = nn.CrossEntropyLoss() # if model.n_classes > 1 else nn.BCEWithLogitsLoss()    # Change to the 2 class version only
     global_step = 0
-
+    
+    mean_losses = []
     # 5. Begin training
     for epoch in range(1, epochs + 1):
         model.train()
@@ -185,13 +186,13 @@ def train_model(
                         logging.info('Validation Dice score: {}'.format(val_score))
                         logging.info('Learning rate: {}'.format(optimizer.param_groups[0]['lr']))
                         #######################JUST PRINTING AND SAVING IMGs ##############################
-                        # Save images and masks
-                        print(images[0].cpu().numpy().shape)
-                        # save_image(np.array(images[0].cpu()), './images/tests/training_imgs.png')
-                        # For the image
-                        image_tensor = images[0].cpu().permute(1, 2, 0).numpy().astype(np.uint8)
-                        print("shape of it: ", image_tensor.shape)
-                        Image.fromarray(image_tensor).save(f'images/image_{global_step}.png')
+                        # # Save images and masks
+                        # print(images[0].cpu().numpy().shape)
+                        # # save_image(np.array(images[0].cpu()), './images/tests/training_imgs.png')
+                        # # For the image
+                        # image_tensor = images[0].cpu().permute(1, 2, 0).numpy().astype(np.uint8)
+                        # print("shape of it: ", image_tensor.shape)
+                        # Image.fromarray(image_tensor).save(f'images/image_{global_step}.png')
 
                         # For the image
                         image_tensor = images[0].cpu().permute(1, 2, 0).numpy()
@@ -202,21 +203,32 @@ def train_model(
                         print("shape of it: ", image_tensor.shape)
                         Image.fromarray(image_tensor).save(f'images/imagewow_{global_step}_{learning_rate}.png')
 
-                        # For the true mask - directly converting to numpy array, as it is 2D
+                        # # For the true mask - directly converting to numpy array, as it is 2D
                         true_mask_tensor = true_masks[0].float().cpu().numpy().astype(np.uint8)
-                        unique_value = np.unique(true_mask_tensor)
-                        print("aaaaayyyyy ", unique_value)
-                        Image.fromarray(true_mask_tensor).save(f'images/true_mask_{global_step}.png')
+                        # unique_value = np.unique(true_mask_tensor)
+                        # print("aaaaayyyyy ", unique_value)
+                        # Image.fromarray(true_mask_tensor).save(f'images/true_mask_{global_step}.png')
 
                         true_mask_tensor = true_masks[0]
                         check_and_save_mask(true_mask_tensor, f'images/true_maskwow_{global_step}_{learning_rate}.png')
 
-                        # For the predicted mask - directly converting to numpy array, as it is 2D
+                        # # For the predicted mask - directly converting to numpy array, as it is 2D
                         pred_mask_tensor = masks_pred.argmax(dim=1)[0].float().cpu().numpy().astype(np.uint8)
-                        Image.fromarray(pred_mask_tensor).save(f'images/pred_mask_{global_step}.png')
+                        # Image.fromarray(pred_mask_tensor).save(f'images/pred_mask_{global_step}.png')
 
                         pred_mask_tensor = masks_pred.argmax(dim=1)[0]
                         check_and_save_mask(pred_mask_tensor, f'images/pred_maskwow_{global_step}_{learning_rate}.png')
+            mean_loss = epoch_loss / n_train
+            mean_losses.append(mean_loss)
+        # Plot and save the graph - Step 3
+        plt.figure(figsize=(10, 5))
+        plt.plot(mean_losses, label='Mean Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Mean Loss Per Epoch')
+        plt.legend()
+        plt.savefig(f'loss_plot_epoch.png')  # Save the plot for the current epoch
+        plt.close()        
 
         if save_checkpoint:
             Path(dir_checkpoint).mkdir(parents=True, exist_ok=True)

@@ -121,7 +121,16 @@ if __name__ == '__main__':
         if not args.no_save:
             out_filename = out_files[i]
             result = mask_to_image(mask, mask_values)
-            result.save(out_filename)
+
+            grayscale_img = result.convert('L')
+            threshold = 128
+
+            bw_img = grayscale_img.point(lambda x : 0 if x < 128 else 255, '1')
+            bw_img.save(out_filename)
+
+
+            
+            # result.save(out_filename)
             logging.info(f'Mask saved to {out_filename}')
 
         if args.viz:
