@@ -8,8 +8,8 @@ import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
 
-from dataload import BasicDataset
-from model import UNet
+from utils.dataload import BasicDataset
+from utils.model import UNet
 import matplotlib.pyplot as plt
 
 def predict_img(net,
