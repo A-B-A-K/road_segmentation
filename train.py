@@ -21,8 +21,12 @@ from utils.model import UNet
 from utils.dataload import BasicDataset
 from utils.dice_score import dice_loss
 
-dir_img = Path('./data/train/images/')
-dir_mask = Path('./data/train/groundtruth/')
+transf = ['original', 'hue', 'contrast', 'brightness', 'saturation']
+
+transformation = transf[0]
+
+dir_img = Path(f'./data/train_aug_transf/train_{transformation}/images/')
+dir_mask = Path(f'./data/train_aug_transf/train_{transformation}/groundtruth/')
 dir_checkpoint = Path('./checkpoints/')
 
 log_file = open('script_output.log', 'w')
@@ -140,13 +144,11 @@ def train_model(
                         image_tensor = image_tensor.astype(np.float32)
                         image_tensor = (image_tensor * 255).clip(0, 255).astype(np.uint8)
                         print("shape of it: ", image_tensor.shape)
-                        # Image.fromarray(image_tensor).save(f'images/imagewow_{global_step}_{learning_rate}.png')
 
                         # # For the true mask - directly converting to numpy array, as it is 2D
                         true_mask_tensor = true_masks[0].float().cpu().numpy().astype(np.uint8)
 
                         true_mask_tensor = true_masks[0]
-                        # check_and_save_mask(true_mask_tensor, f'images/true_maskwow_{global_step}_{learning_rate}.png')
 
                         # # For the predicted mask - directly converting to numpy array, as it is 2D
                         pred_mask_tensor = masks_pred.argmax(dim=1)[0].float().cpu().numpy().astype(np.uint8)
@@ -181,16 +183,16 @@ def train_model(
         plt.plot(val_losses, label='Validation Loss', marker='x')
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
-        plt.title('Training and Validation Loss Per Epoch')
+        plt.title(f'Training and Validation Loss Per Epoch ({transformation})')
         plt.legend()
-        plt.savefig('training_validation_loss_plot.png')
+        plt.savefig(f'training_validation_loss_plot_{transformation}.png')
         plt.close()      
 
         if save_checkpoint:
             Path(dir_checkpoint).mkdir(parents=True, exist_ok=True)
             state_dict = model.state_dict()
             state_dict['mask_values'] = dataset.mask_values
-            torch.save(state_dict, str(dir_checkpoint / 'checkpoint_epoch{}.pth'.format(epoch)))
+            torch.save(state_dict, str(dir_checkpoint / f'checkpoint_epoch{epoch}_{transformation}.pth'))
             logging.info(f'Checkpoint {epoch} saved!')
 
 def get_args():

@@ -1,30 +1,44 @@
 #!/bin/bash
 
-validation_dir="data/val/images"
-# Start and end indices for image and tile iteration
-order=1
-start_tile_i=1
-end_tile_i=$((order * order))
-model=checkpoints/checkpoint_epoch15.pth
-predict_output="validation_e15"
+# Create scaled directory and its subdirectories
+mkdir -p scaled/images
+mkdir -p scaled/pred
 
-for image_file in "${validation_dir}"/*.png; do
-    # Extract the base name of the image (without extension)
-    image=$(basename "${image_file}" .png)
+# Define models and their corresponding output directories
+declare -A models
+models[original_40]=checkpoints/checkpoint_epoch40_original.pth
+# models[brightness]=checkpoints/checkpoint_epoch15_brightness.pth
+# models[contrast]=checkpoints/checkpoint_epoch15_contrast.pth
+# models[hue]=checkpoints/checkpoint_epoch15_hue.pth
+# models[saturation]=checkpoints/checkpoint_epoch15_saturation.pth
 
-    echo "Processing Image ${image}"
-    python utils/tile_creator.py "data/val/images/${image}.png" "tiles/tiles_${image}" --order $order
+# Loop through all images in the val_aug/images directory
+for image_path in data/val_aug/images/*.png
+do
+    # Extract the basename of the image file without the extension
+    image=$(basename "$image_path" .png)
+    echo "Processing Image $image"
 
+    # Upscale the image
+    python utils/scaling.py "data/val_aug/images/${image}.png" "scaled/images/${image}_upscaled.png" -s 2
 
-    # Loop through the tile indices
-    for tile_index in $(seq $start_tile_i $end_tile_i); do
-        echo "Predicting Tile ${tile_index} for Image ${image}"
-        python predict.py -i "tiles/tiles_${image}/ordered_tile_${tile_index}.png" -o "tiles/tiles_${image}_pred/mask_tile_${tile_index}.png" --model $model
+    for model_key in "${!models[@]}"
+    do
+        model=${models[$model_key]}
+        echo "Processing Model $model_key for Image $image"
+
+        # Apply prediction model
+        echo "Predicting Image: $image (Model: $model_key)"
+        python predict.py -i "scaled/images/${image}_upscaled.png" -o "scaled/pred/mask_${image}_${model_key}.png" --model $model
+
+        # Downscale the image
+        echo "Downscaling Image: $image (Model: $model_key)"
+        mkdir -p data/val_aug/pred/$model_key
+        python utils/scaling.py "scaled/pred/mask_${image}_${model_key}.png" "data/val_aug/pred/$model_key/${image}.png" -s 0.5
     done
-
-    echo "Assembling Tiles for Image ${image}"
-    mkdir -p predictions/$predict_output
-    python utils/tile_assembly.py "tiles/tiles_${image}_pred" "predictions/$predict_output/${image}.png" --order $order
 done
+
+# Optionally, you can remove the scaled directory at the end
+rm -r scaled
 
 echo "All images processed successfully."

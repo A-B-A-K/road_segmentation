@@ -1,28 +1,45 @@
 #!/bin/bash
 
-# Start and end indices for image and tile iteration
-order=1
-start_image_i=6
-end_image_i=6
-start_tile_i=1
-end_tile_i=$((order * order))
-model=checkpoints/checkpoint_epoch15.pth
-predict_output="new_predictions_one"
+# Create scaled directory and its subdirectories
+mkdir -p scaled/images
+mkdir -p scaled/pred
+
+# Start and end indices for image iteration
+start_image_i=1
+end_image_i=50
+
+# Define models and their corresponding output directories
+declare -A models
+models[original_thi]=checkpoints/checkpoint_epoch30_original.pth
+# models[brightness]=checkpoints/checkpoint_epoch15_brightness.pth
+# models[contrast]=checkpoints/checkpoint_epoch15_contrast.pth
+# models[hue]=checkpoints/checkpoint_epoch15_hue.pth
+# models[saturation]=checkpoints/checkpoint_epoch15_saturation.pth
 
 for image_index in $(seq $start_image_i $end_image_i)
 do
     echo "Processing Image $image_index"
-    python utils/tile_creator.py "data/test_set_images/test_${image_index}/test_${image_index}.png" "tiles/tiles_${image_index}" --order $order
 
-    for tile_index in $(seq $start_tile_i $end_tile_i)
+    # Upscale the image
+    python utils/scaling.py "data/test_set_images/test_${image_index}/test_${image_index}.png" "scaled/images/${image_index}_upscaled.png" -s 2
+
+    for model_key in "${!models[@]}"
     do
-        echo "Predicting Tile $tile_index for Image $image_index"
-        python predict.py -i "tiles/tiles_${image_index}/ordered_tile_${tile_index}.png" -o "tiles/tiles_${image_index}_pred/mask_tile_${tile_index}.png" --model $model
-    done
+        model=${models[$model_key]}
+        echo "Processing Model $model_key for Image $image_index"
 
-    echo "Assembling Tiles for Image $image_index"
-    mkdir -p predictions/$predict_output
-    python utils/tile_assembly.py "tiles/tiles_${image_index}_pred" "predictions/$predict_output/pred_test_${image_index}.png" --order $order
+        # Apply prediction model
+        echo "Predicting Image $image_index (Model: $model_key)"
+        python predict.py -i "scaled/images/${image_index}_upscaled.png" -o "scaled/pred/mask_${image_index}_${model_key}.png" --model $model
+
+        # Downscale the image
+        echo "Downscaling Image $image_index (Model: $model_key)"
+        mkdir -p predictions/$model_key
+        python utils/scaling.py "scaled/pred/mask_${image_index}_${model_key}.png" "predictions/$model_key/pred_test_${image_index}.png" -s 0.5
+    done
 done
+
+# Optionally, you can remove the scaled directory at the end
+rm -r scaled
 
 echo "All images processed successfully."

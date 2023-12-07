@@ -81,11 +81,17 @@ def process_image(image_path, size_threshold, output_directory, prediction_subfo
 # To use the function, provide the path to your image and the size threshold as follows:
 # process_image('path_to_your_image.png', your_size_threshold)
 
-def main(folder_path, size_threshold=1000):
+def main(folder_path, size_threshold=500):
 
-    output_directory = f"./DBSCAN_process/{size_threshold}"
-    prediction_subfolder = "./predictions/DBSCAN_-_"
-    
+    # Base directory for utils, which is the parent directory of the script's location
+    base_utils_dir = os.path.dirname(__file__)
+
+    # Output directory for DBSCAN processed images, relative to the utils directory
+    output_directory = os.path.join(base_utils_dir, '..', 'DBSCAN_process', str(size_threshold))
+    os.makedirs(output_directory, exist_ok=True)
+
+    # Subfolder within the predictions directory for DBSCAN processed images
+    prediction_subfolder = os.path.join(base_utils_dir, '..', 'predictions', 'original_thi_DBSCAN')
     os.makedirs(prediction_subfolder, exist_ok=True)
 
     # Check if the folder exists
@@ -103,7 +109,7 @@ def main(folder_path, size_threshold=1000):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process images in a folder and remove small clusters.")
     parser.add_argument("folder_path", type=str, help="Path to the folder containing images.")
-    parser.add_argument("--threshold", type=int, default=1000, help="Size threshold for removing small clusters.")
+    parser.add_argument("--threshold", type=int, default=500, help="Size threshold for removing small clusters.")
     
     args = parser.parse_args()
     
