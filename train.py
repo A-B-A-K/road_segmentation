@@ -17,11 +17,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 
+import wandb
+
 from utils.evaluate import evaluate
 from utils.model import UNet
 from utils.leaky_model import LeakyUNet
 from utils.dataload import BasicDataset
 from utils.dice_score import dice_loss
+
+
+use_wandb = False
 
 transf = ['original', 'hue', 'contrast', 'brightness', 'saturation', '']
 
@@ -62,12 +67,9 @@ def train_model(
         weight_decay: float = 1e-8,
         momentum: float = 0.999,
         gradient_clipping: float = 1.0,
-        # dataset: str = 'original'
 ):
 
     # 1. Create dataset
-    # dir_img = datasets[transf]['image']
-    # dir_mask = datasets[transf]['groundtruth']
     dataset = BasicDataset(dir_img, dir_mask, img_scale)
 
 
@@ -81,7 +83,13 @@ def train_model(
     train_loader = DataLoader(train_set, shuffle=True, **loader_args)
     val_loader = DataLoader(val_set, shuffle=False, drop_last=True, **loader_args)
 
-
+    if use_wandb:
+        # (Initialize logging)
+        experiment = wandb.init(project='U-Net', resume='allow', anonymous='must')
+        experiment.config.update(
+            dict(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate,
+                val_percent=val_percent, save_checkpoint=save_checkpoint, img_scale=img_scale, amp=amp)
+        )
     
     logging.basicConfig(filename='training_log.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
