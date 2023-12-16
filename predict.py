@@ -10,7 +10,10 @@ from torchvision import transforms
 
 from utils.dataload import BasicDataset
 from utils.model import UNet
+from utils.leaky_model import LeakyUNet
 import matplotlib.pyplot as plt
+
+leaky = False
 
 def predict_img(net,
                 full_img,
@@ -95,7 +98,10 @@ if __name__ == '__main__':
     in_files = args.input
     out_files = get_output_filenames(args)
 
-    net = UNet(n_channels=3, n_classes=args.classes, bilinear=args.bilinear)
+    if leaky:
+        net = LeakyUNet(n_channels=3, n_classes=args.classes, bilinear=args.bilinear)
+    else:  
+        net = UNet(n_channels=3, n_classes=args.classes, bilinear=args.bilinear)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logging.info(f'Loading model {args.model}')

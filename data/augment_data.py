@@ -8,12 +8,12 @@ warnings.filterwarnings('ignore')
 # Define directories
 orig_dirs = {
     'train': {
-        'images': './data/train/images/',
-        'groundtruth': './data/train/groundtruth/'
+        'images': './data/train++/images/',
+        'groundtruth': './data/train++/groundtruth/'
     },
     'val': {
-        'images': './data/val/images/',
-        'groundtruth': './data/val/groundtruth/'
+        'images': './data/val++/images/',
+        'groundtruth': './data/val++/groundtruth/'
     }
 }
 

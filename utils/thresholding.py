@@ -8,13 +8,14 @@ def apply_threshold(image_array, threshold=128):
 
 def main(threshold_value):
     # Base directory for predictions, relative to the current working directory of the script
-    base_dir = os.path.join(os.path.dirname(__file__), '..', 'predictions')
+    # base_dir = os.path.join(os.path.dirname(__file__), '..', 'predictions')
+    base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val++/pred')
 
     # Directory for the weighted averages
-    weighted_avg_dir = os.path.join(base_dir, 'weighted_avg_DBSCAN')
+    weighted_avg_dir = os.path.join(base_dir, 'wa_equal_0')
 
     # Directory for the binary masks
-    binary_masks_dir = os.path.join(base_dir, f'binary_masks_DBSCAN_c_{threshold_value/256}')
+    binary_masks_dir = os.path.join(base_dir, f'bin_wa_equal_{threshold_value/256}')
     os.makedirs(binary_masks_dir, exist_ok=True)
 
     # Process each weighted average image

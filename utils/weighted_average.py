@@ -19,9 +19,10 @@ def calculate_weighted_average(images, weights):
 def main(directories, weights):
     # Base directory for predictions, relative to the current working directory of the script
     base_dir = os.path.join(os.path.dirname(__file__), '..', 'predictions')
+    # base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val++/pred')
 
     # Directory for the weighted averages
-    weighted_avg_dir = os.path.join(base_dir, 'weighted_avg_DBSCAN_sq')
+    weighted_avg_dir = os.path.join(base_dir, 'wa_equal++')
     os.makedirs(weighted_avg_dir, exist_ok=True)
 
     # Assuming image names are consistent across folders, get the list from the first directory

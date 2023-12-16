@@ -23,27 +23,55 @@ from utils.leaky_model import LeakyUNet
 from utils.dataload import BasicDataset
 from utils.dice_score import dice_loss
 
-transf = ['original', 'hue', 'contrast', 'brightness', 'saturation', '']
+transforms = ['original', 'hue', 'contrast', 'brightness', 'saturation']
 
-transformation = transf[0]
+# transformation = transf[0]
 leaky       = False
 augmented   = True
 transformed = True
 
+datasets = {
+    'original': {
+        'images': Path('./data/train_aug++_transf/train_original/images/'),
+        'groundtruth': Path('./data/train_aug++_transf/train_original/groundtruth/')
+    },
+    'hue': {
+        'images': Path('./data/train_aug++_transf/train_hue/images/'),
+        'groundtruth': Path('./data/train_aug++_transf/train_hue/groundtruth/')
+    },
+    'contrast': {
+        'images': Path('./data/train_aug++_transf/train_contrast/images/'),
+        'groundtruth': Path('./data/train_aug++_transf/train_contrast/groundtruth/')
+    },
+    'brightness': {
+        'images': Path('./data/train_aug++_transf/train_brightness/images/'),
+        'groundtruth': Path('./data/train_aug++_transf/train_brightness/groundtruth/')
+    },
+    'saturation': {
+        'images': Path('./data/train_aug++_transf/train_saturation/images/'),
+        'groundtruth': Path('./data/train_aug++_transf/train_saturation/groundtruth/')
+    },
+    '': {
+        'images': Path(f'./data/train/images/'),
+        'groundtruth': Path(f'./data/train/groundtruth/')
+    }
+}
 
-if augmented:
-    if transformed:
-        dir_img = Path(f'./data/train_aug++_transf/train_{transformation}/images/')
-        dir_mask = Path(f'./data/train_aug++_transf/train_{transformation}/groundtruth/')    
-    else:
-        dir_img = Path(f'./data/train_aug/images/')
-        dir_mask = Path(f'./data/train_aug/groundtruth/')   
-else:
-    dir_img = Path(f'./data/train/images/')
-    dir_mask = Path(f'./data/train/groundtruth/')
 
-# dir_img = Path(f'./data/mit_data/images/')
-# dir_mask = Path(f'./data/mit_data/groundtruth/')
+
+# if augmented:
+#     if transformed:
+#         dir_img = Path(f'./data/train_aug_transf/train_{transformation}/images/')
+#         dir_mask = Path(f'./data/train_aug_transf/train_{transformation}/groundtruth/')    
+#     else:
+#         dir_img = Path(f'./data/train_aug/images/')
+#         dir_mask = Path(f'./data/train_aug/groundtruth/')   
+# else:
+#     dir_img = Path(f'./data/train/images/')
+#     dir_mask = Path(f'./data/train/groundtruth/')
+
+dir_img = Path(f'./data/mit_data/images/')
+dir_mask = Path(f'./data/mit_data/groundtruth/')
 dir_checkpoint = Path('./checkpoints/')
 
 log_file = open('script_output.log', 'w')
@@ -62,13 +90,12 @@ def train_model(
         weight_decay: float = 1e-8,
         momentum: float = 0.999,
         gradient_clipping: float = 1.0,
-        # dataset: str = 'original'
+        dirs: tuple = (dir_img, dir_mask),
+        tran: str = 'original'
 ):
 
     # 1. Create dataset
-    # dir_img = datasets[transf]['image']
-    # dir_mask = datasets[transf]['groundtruth']
-    dataset = BasicDataset(dir_img, dir_mask, img_scale)
+    dataset = BasicDataset(dirs[0], dirs[1], img_scale)
 
 
     # 2. Split into train / validation partitions
@@ -204,16 +231,16 @@ def train_model(
         plt.plot(val_losses, label='Validation Loss', marker='x')
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
-        plt.title(f'Training and Validation Loss Per Epoch ({transformation})')
+        plt.title(f'Training and Validation Loss Per Epoch ({tran})')
         plt.legend()
-        plt.savefig(f'training_validation_loss_plot_{transformation}.png')
+        plt.savefig(f'training_validation_loss_plot_{tran}.png')
         plt.close()      
 
         if save_checkpoint:
             Path(dir_checkpoint).mkdir(parents=True, exist_ok=True)
             state_dict = model.state_dict()
             state_dict['mask_values'] = dataset.mask_values
-            torch.save(state_dict, str(dir_checkpoint / f'checkpoint_epoch{epoch}_{transformation}.pth'))
+            torch.save(state_dict, str(dir_checkpoint / f'checkpoint_epoch{epoch}_{tran}.pth'))
             logging.info(f'Checkpoint {epoch} saved!')
 
 def get_args():
@@ -303,46 +330,51 @@ if __name__ == '__main__':
         logging.info(f'Model loaded from {args.load}')
 
     model.to(device=device)
-    start_time = datetime.now()
-    print(f"Start Time: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
-    try:
+    for tran in transforms:
+        directories = (datasets[tran]['images'], datasets[tran]['groundtruth'])
+        start_time = datetime.now()
+        try:
 
-        train_model(
-            model=model,
-            epochs=args.epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.lr,
-            device=device,
-            img_scale=args.scale,
-            val_percent=args.val / 100,
-            amp=args.amp,
-        )
-    except torch.cuda.OutOfMemoryError:
-        logging.error('Detected OutOfMemoryError! '
-                      'Enabling checkpointing to reduce memory usage, but this slows down training. '
-                      'Consider enabling AMP (--amp) for fast and memory efficient training')
-        torch.cuda.empty_cache()
-        model.use_checkpointing()
-        train_model(
-            model=model,
-            epochs=args.epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.lr,
-            device=device,
-            img_scale=args.scale,
-            val_percent=args.val / 100,
-            amp=args.amp
-        )
-    end_time = datetime.now()  # Capture end time
-    duration = end_time - start_time  # Calculate duration
+            train_model(
+                model=model,
+                epochs=args.epochs,
+                batch_size=args.batch_size,
+                learning_rate=args.lr,
+                device=device,
+                img_scale=args.scale,
+                val_percent=args.val / 100,
+                amp=args.amp,
+                dirs=directories,
+                tran=tran
+            )
+        except torch.cuda.OutOfMemoryError:
+            logging.error('Detected OutOfMemoryError! '
+                        'Enabling checkpointing to reduce memory usage, but this slows down training. '
+                        'Consider enabling AMP (--amp) for fast and memory efficient training')
+            torch.cuda.empty_cache()
+            model.use_checkpointing()
+            train_model(
+                model=model,
+                epochs=args.epochs,
+                batch_size=args.batch_size,
+                learning_rate=args.lr,
+                device=device,
+                img_scale=args.scale,
+                val_percent=args.val / 100,
+                amp=args.amp,
+                dirs=directories,
+                tran=tran
+            )
+        end_time = datetime.now()  # Capture end time
+        duration = end_time - start_time  # Calculate duration
 
-    # Formatting the duration into hh:mm:ss
-    duration_formatted = str(duration).split('.')[0]
+        # Formatting the duration into hh:mm:ss
+        duration_formatted = str(duration).split('.')[0]
 
-    print(f"Transformation: {tran}")
-    
-    print(f"End Time: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Duration: {duration_formatted}")
+        print(f"Transformation: {tran}")
+        print(f"Start Time: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"End Time: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"Duration: {duration_formatted}")
 
 sys.stdout = sys.__stdout__
 log_file.close()

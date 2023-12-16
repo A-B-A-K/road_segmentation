@@ -6,21 +6,25 @@ mkdir -p scaled/pred
 
 # Define models and their corresponding output directories
 declare -A models
-models[original_40]=checkpoints/checkpoint_epoch40_original.pth
-# models[brightness]=checkpoints/checkpoint_epoch15_brightness.pth
-# models[contrast]=checkpoints/checkpoint_epoch15_contrast.pth
-# models[hue]=checkpoints/checkpoint_epoch15_hue.pth
-# models[saturation]=checkpoints/checkpoint_epoch15_saturation.pth
+# models[hue_50_plus]='checkpoints/checkpoint_epoch50_hue.pth'
+# models[sat_50_plus]='checkpoints/checkpoint_epoch33_saturation.pth'
+# models[bright_50_plus]='checkpoints/checkpoint_epoch50_brightness.pth'
+# models[contr_50_plus]='checkpoints/checkpoint_epoch50_contrast.pth'
+# models[orig_50_plus]='checkpoints/checkpoint_epoch50_original.pth'
+# models[orig_15_plus]='weights/original_15++.pth'
+models[orig_75_32_-6]='checkpoints/checkpoint_epoch25_original.pth'
+
+val='val++'
 
 # Loop through all images in the val_aug/images directory
-for image_path in data/val_aug/images/*.png
+for image_path in data/${val}/images/*.png
 do
     # Extract the basename of the image file without the extension
     image=$(basename "$image_path" .png)
     echo "Processing Image $image"
 
     # Upscale the image
-    python utils/scaling.py "data/val_aug/images/${image}.png" "scaled/images/${image}_upscaled.png" -s 2
+    python utils/scaling.py "data/${val}/images/${image}.png" "scaled/images/${image}_upscaled.png" -s 2
 
     for model_key in "${!models[@]}"
     do
@@ -33,8 +37,8 @@ do
 
         # Downscale the image
         echo "Downscaling Image: $image (Model: $model_key)"
-        mkdir -p data/val_aug/pred/$model_key
-        python utils/scaling.py "scaled/pred/mask_${image}_${model_key}.png" "data/val_aug/pred/$model_key/${image}.png" -s 0.5
+        mkdir -p data/${val}/pred/$model_key
+        python utils/scaling.py "scaled/pred/mask_${image}_${model_key}.png" "data/${val}/pred/$model_key/${image}.png" -s 0.5
     done
 done
 

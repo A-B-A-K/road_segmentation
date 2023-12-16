@@ -74,7 +74,7 @@ def create_augmented_dataset(base_path, transformations):
             shutil.copytree(groundtruth_path, output_groundtruth_path)
 
 def main():
-    base_path = './data/train_aug'
+    base_path = './data/train_aug++'
     transformations = ['hue', 'saturation', 'contrast', 'brightness', 'original']
 
     create_augmented_dataset(base_path, transformations)

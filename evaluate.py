@@ -2,12 +2,17 @@ import os
 import glob
 import cv2
 import numpy as np
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
+
+val = 'val++'
+models = ['orig', 'hue', 'sat', 'contr', 'bright']
+
+model = 'orig_75_32_-6'
 
 # Define paths
-image_folder = './data/val_aug/images'
-ground_truth_folder = './data/val_aug/groundtruth'
-predictions_folder = './data/val_aug/pred/original_40'
+image_folder = f'./data/{val}/images'
+ground_truth_folder = f'./data/{val}/groundtruth'
+predictions_folder = f'./data/{val}/pred/{model}'
 
 # Check if paths exist
 if not os.path.exists(image_folder) or not os.path.exists(ground_truth_folder) or not os.path.exists(predictions_folder):
@@ -30,10 +35,12 @@ predictions = load_images(predictions_folder)
 if set(images.keys()) != set(ground_truths.keys()) or set(images.keys()) != set(predictions.keys()):
     raise ValueError("Mismatch in filenames across folders.")
 
-# Flatten and calculate F1 score
+# Flatten and calculate F1 score and accuracy
 ground_truth_vals = np.array([ground_truths[key].flatten() for key in sorted(ground_truths.keys())]).flatten()
 predictions_vals = np.array([predictions[key].flatten() for key in sorted(predictions.keys())]).flatten()
 
 f1 = f1_score(ground_truth_vals, predictions_vals, pos_label=255)
+accuracy = accuracy_score(ground_truth_vals, predictions_vals)
 
-print(f1)
+print(f"F1 Score: {f1}")
+print(f"Accuracy: {accuracy}")
