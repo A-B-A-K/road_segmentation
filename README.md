@@ -104,6 +104,11 @@ bash pipeline_test.sh
 - The threshold for removing small clusters through DBSCAN.
 - The up-scaling and down-scaling factors (ideally the one should be inversely proportional to the other).
 
+>You can also download the weights that grant us the best results by executing the following bash script:
+```bash
+bash download_weights.sh 
+```
+
 ### Ensemble Learning
 
 To create predictions using weighted averages one can use the following bash file:
