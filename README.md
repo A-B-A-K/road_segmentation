@@ -4,7 +4,8 @@
 
 The training and testing data we use is located in the `data` directory. To download our data you can run:
 ```bash
-bash download_dataset.sh
+bash download_train_set.sh
+bash download_test_set.sh
 ```
 
 The training directory has to have the following structure:
@@ -19,7 +20,7 @@ The training directory has to have the following structure:
 >python data/binarize_dir.py
 >```
 >_Note that the directory to be binarized can be adjusted in the script._
->_Note that the groundtruth masks downloaded with `download_dataset.sh` in the ./data/training/groundtruths folder are not binary._
+>_Note that the groundtruth masks downloaded with `download_train_set.sh` in the ./data/training/groundtruths folder are not binary._
 
 
 
