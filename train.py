@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 
-import wandb
+# import wandb
 
 from utils.evaluate import evaluate
 from utils.model import UNet
@@ -38,8 +38,8 @@ transformed = True
 
 if augmented:
     if transformed:
-        dir_img = Path(f'./data/train_aug++_transf/train_{transformation}/images/')
-        dir_mask = Path(f'./data/train_aug++_transf/train_{transformation}/groundtruth/')    
+        dir_img = Path(f'./data/train_aug_v2++_transf/train_{transformation}/images/')
+        dir_mask = Path(f'./data/train_aug_v2++_transf/train_{transformation}/groundtruth/')    
     else:
         dir_img = Path(f'./data/train_aug/images/')
         dir_mask = Path(f'./data/train_aug/groundtruth/')   
@@ -210,6 +210,7 @@ def train_model(
         plt.figure(figsize=(10, 5))
         plt.plot(train_losses, label='Training Loss', marker='o')
         plt.plot(val_losses, label='Validation Loss', marker='x')
+        plt.ylim([-0.2, 1])
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
         plt.title(f'Training and Validation Loss Per Epoch ({transformation})')
@@ -346,8 +347,6 @@ if __name__ == '__main__':
 
     # Formatting the duration into hh:mm:ss
     duration_formatted = str(duration).split('.')[0]
-
-    print(f"Transformation: {tran}")
     
     print(f"End Time: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Duration: {duration_formatted}")

@@ -7,7 +7,7 @@ from sklearn.metrics import f1_score, accuracy_score
 val = 'val++'
 models = ['orig', 'hue', 'sat', 'contr', 'bright']
 
-model = 'orig_75_32_-6'
+model = 'bin_wa_uneq4_ohcbs_db_0.9'
 
 # Define paths
 image_folder = f'./data/{val}/images'

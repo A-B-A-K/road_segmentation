@@ -22,7 +22,7 @@ def main(directories, weights):
     # base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val++/pred')
 
     # Directory for the weighted averages
-    weighted_avg_dir = os.path.join(base_dir, 'wa_equal++')
+    weighted_avg_dir = os.path.join(base_dir, 'wa_uneq4_ohcbs_db500')
     os.makedirs(weighted_avg_dir, exist_ok=True)
 
     # Assuming image names are consistent across folders, get the list from the first directory

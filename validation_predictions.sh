@@ -12,7 +12,9 @@ declare -A models
 # models[contr_50_plus]='checkpoints/checkpoint_epoch50_contrast.pth'
 # models[orig_50_plus]='checkpoints/checkpoint_epoch50_original.pth'
 # models[orig_15_plus]='weights/original_15++.pth'
-models[orig_75_32_-6]='checkpoints/checkpoint_epoch25_original.pth'
+# models[orig_100_32_-6]='weights/models++/checkpoint_epoch100_original.pth'
+models[orig_150_32_-5_new]='checkpoints/checkpoint_epoch150_original.pth'
+
 
 val='val++'
 

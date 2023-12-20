@@ -231,6 +231,7 @@ def train_model(
         plt.plot(val_losses, label='Validation Loss', marker='x')
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
+        plt.ylim([-0.2, 1])
         plt.title(f'Training and Validation Loss Per Epoch ({tran})')
         plt.legend()
         plt.savefig(f'training_validation_loss_plot_{tran}.png')

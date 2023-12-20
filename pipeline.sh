@@ -10,11 +10,14 @@ end_image_i=50
 
 # Define models and their corresponding output directories
 declare -A models
-models[hue_50_plus]='checkpoints/checkpoint_epoch50_hue.pth'
-models[sat_50_plus]='checkpoints/checkpoint_epoch45_saturation.pth'
-models[bright_50_plus]='checkpoints/checkpoint_epoch50_brightness.pth'
-models[contr_50_plus]='checkpoints/checkpoint_epoch50_contrast.pth'
-models[orig_50_plus]='checkpoints/checkpoint_epoch50_original.pth'
+# models[hue_50_plus]='checkpoints/checkpoint_epoch50_hue.pth'
+# models[sat_50_plus]='checkpoints/checkpoint_epoch45_saturation.pth'
+# models[bright_50_plus]='checkpoints/checkpoint_epoch50_brightness.pth'
+# models[contr_50_plus]='checkpoints/checkpoint_epoch50_contrast.pth'
+# models[orig_50_plus]='checkpoints/checkpoint_epoch50_original.pth'
+# models[orig_best_hun]='weights/models++/checkpoint_epoch100_original.pth'
+# models[hue_best_bs]='checkpoints/checkpoint_epoch150_hue.pth'
+models[sat_best_bs]='weights/best/checkpoint_epoch150_saturation.pth'
 
 for image_index in $(seq $start_image_i $end_image_i)
 do

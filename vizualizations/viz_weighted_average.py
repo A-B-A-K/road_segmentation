@@ -3,14 +3,14 @@ import matplotlib.image as mpimg
 from pathlib import Path
 
 original_img = mpimg.imread('./predictions/orig/pred_test_22.png')
-hue_img = mpimg.imread('./predictions/hue/pred_test_22.png')
+hue_img = mpimg.imread('./predictions/hue_best_bs/pred_test_22.png')
 saturation_img = mpimg.imread('./predictions/sat/pred_test_22.png')
 contrast_img = mpimg.imread('./predictions/contr/pred_test_22.png')
 brightness_img = mpimg.imread('./predictions/bright/pred_test_22.png')
 weighted_avg_img = mpimg.imread('./predictions/wa_equal_test/pred_test_22.png') # Assuming the weighted average is reusing the original image path
 
 # Create a figure with subplots
-fig, axs = plt.subplots(2, 3, figsize=(15, 10))
+fig, axs = plt.subplots(2, 3, figsize=(10, 8))
 
 # Set the title of the figure
 # fig.suptitle('Road Segmentation Predictions and Weighted Average', fontsize=16)

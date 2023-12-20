@@ -91,8 +91,8 @@ def main(folder_path, size_threshold=500):
     os.makedirs(output_directory, exist_ok=True)
 
     # Subfolder within the predictions directory for DBSCAN processed images
-    # prediction_subfolder = os.path.join(base_utils_dir, '..', 'data/val/pred', 'sat_DBSCAN1000')
-    prediction_subfolder = os.path.join(base_utils_dir, '..', 'predictions', 'bin_eq++_DBSCAN')
+    # prediction_subfolder = os.path.join(base_utils_dir, '..', 'data/val++/pred', 'bright_150_32_-5_DBSCAN500')
+    prediction_subfolder = os.path.join(base_utils_dir, '..', 'predictions', 'hue_best_bs_DB')
     os.makedirs(prediction_subfolder, exist_ok=True)
 
     # Check if the folder exists

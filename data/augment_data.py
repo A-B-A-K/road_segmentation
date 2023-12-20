@@ -19,12 +19,12 @@ orig_dirs = {
 
 aug_dirs = {
     'train': {
-        'images': './data/train_aug/images/',
-        'groundtruth': './data/train_aug/groundtruth/'
+        'images': './data/train_aug_v2++/images/',
+        'groundtruth': './data/train_aug_v2++/groundtruth/'
     },
     'val': {
-        'images': './data/val_aug/images/',
-        'groundtruth': './data/val_aug/groundtruth/'
+        'images': './data/val_aug_v2++/images/',
+        'groundtruth': './data/val_aug_v2++/groundtruth/'
     }
 }
 
@@ -38,9 +38,9 @@ for key in aug_dirs:
 transformations = ['original', 'flip', 'rotate', 'scale']
 
 # Parameters for transformations
-angles = [90, 180, 270]
+angles = [45, 90, 135, 180, 225, 270, 315]
 directions = ['horizontal', 'vertical']
-scales = [1.25, 1.5, 1.75, 2]
+scales = [1.5, 2, 2.5, 3]
 
 # Function to apply transformations
 def apply_transformations(orig_image_dir, orig_gt_dir, aug_image_dir, aug_gt_dir, set_type):
