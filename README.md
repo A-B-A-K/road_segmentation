@@ -19,6 +19,7 @@ The training directory has to have the following structure:
 >python data/binarize_dir.py
 >```
 >_Note that the directory to be binarized can be adjusted in the script._
+>_Note that the groundtruth masks downloaded with `download_dataset.sh` in the ./data/training/groundtruths folder are not binary._
 
 
 
