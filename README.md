@@ -14,7 +14,7 @@ The training directory has to have the following structure:
 <div style="background-color:#a63d40; color:#ffffff; border-left: 5px solid #d9534f; padding: 10px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <strong style="font-size: 1em;">Warning!</strong> If your ground truths are not binary, you need to binarize them. To do so, use the following command:
     <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 5px; border-radius: 3px; font-family: 'Courier New', Courier, monospace;">
-        python data/binarize_dir.py
+        ```bash python data/binarize_dir.py```
     </div>
     <i>Note that the directory to be binarized can be adjusted in the script.</i>
 </div>
