@@ -23,16 +23,17 @@ from utils.leaky_model import LeakyUNet
 from utils.dataload import BasicDataset
 from utils.dice_score import dice_loss
 
-
-use_wandb = False
-
-transf = ['original', 'hue', 'contrast', 'brightness', 'saturation', '']
+# Custom preset-directories
+#   Need to run the following files to have them work:
+#       - data/split_data.py
+#       - data/augment_data.py
+#       - data/transform_data.py
+#   In that order
+transf = ['original', 'hue', 'contrast', 'brightness', 'saturation']
 
 transformation = transf[0]
-leaky       = False
 augmented   = True
 transformed = True
-
 
 if augmented:
     if transformed:
@@ -44,6 +45,10 @@ if augmented:
 else:
     dir_img = Path(f'./data/train/images/')
     dir_mask = Path(f'./data/train/groundtruth/')
+
+# # Manualy define directories to train
+# dir_img = Path(f'./data/train/images/')
+# dir_mask = Path(f'./data/train/groundtruth/')
 
 dir_checkpoint = Path('./checkpoints/')
 
@@ -78,14 +83,6 @@ def train_model(
     loader_args = dict(batch_size=batch_size, num_workers=os.cpu_count(), pin_memory=True)
     train_loader = DataLoader(train_set, shuffle=True, **loader_args)
     val_loader = DataLoader(val_set, shuffle=False, drop_last=True, **loader_args)
-
-    if use_wandb:
-        # (Initialize logging)
-        experiment = wandb.init(project='U-Net', resume='allow', anonymous='must')
-        experiment.config.update(
-            dict(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate,
-                val_percent=val_percent, save_checkpoint=save_checkpoint, img_scale=img_scale, amp=amp)
-        )
     
     logging.basicConfig(filename='training_log.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
