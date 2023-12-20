@@ -2,7 +2,10 @@
 
 ## Setup
 
-The training and testing data we use is located in the `data` directory. 
+The training and testing data we use is located in the `data` directory. To download our data you can run:
+```bash
+bash download_dataset.sh
+```
 
 The training directory has to have the following structure:
 ```bash
