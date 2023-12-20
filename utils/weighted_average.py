@@ -16,13 +16,15 @@ def calculate_weighted_average(images, weights):
     # Clip values to be in the range [0, 255] and convert to uint8
     return np.clip(weighted_avg, 0, 255).astype(np.uint8)
 
-def main(directories, weights):
+def main(directories, weights, apply_on):
     # Base directory for predictions, relative to the current working directory of the script
-    base_dir = os.path.join(os.path.dirname(__file__), '..', 'predictions')
-    # base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val++/pred')
+    if apply_on == 'test':
+        base_dir = os.path.join(os.path.dirname(__file__), '..', 'predictions')
+    if apply_on == 'val':
+        base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val/pred')
 
     # Directory for the weighted averages
-    weighted_avg_dir = os.path.join(base_dir, 'wa_uneq4_ohcbs_db500')
+    weighted_avg_dir = os.path.join(base_dir, 'weighted_average')
     os.makedirs(weighted_avg_dir, exist_ok=True)
 
     # Assuming image names are consistent across folders, get the list from the first directory
@@ -48,15 +50,15 @@ def main(directories, weights):
             weighted_avg_img.save(os.path.join(weighted_avg_dir, image_name))
 
 if __name__ == "__main__":
-    args = sys.argv[1:]  # Exclude the script name itself
-    
+    args = sys.argv[2:]  # Exclude the script name itself
+
     if len(args) % 2 != 0:
-        print("Usage: python weighted_avg.py dir1 weight1 dir2 weight2 ...")
+        print("Usage: python weighted_avg.py train dir1 weight1 dir2 weight2 ...")
         sys.exit(1)
     
     # Split arguments into directories and their corresponding weights
     directories = args[0::2]  # Take every second argument starting from 0
     weights = [float(w) for w in args[1::2]]  # Take every second argument starting from 1
-    
+
     # Run the main function with the parsed directories and weights
-    main(directories, weights)
+    main(directories, weights, sys.argv[1])

@@ -92,14 +92,37 @@ To evaluate the performance of the validation set the following bash file should
 ```bash
 bash pipeline_val.sh
 ```
+Similarly to create predictions on the test set (without evaluating since we have no groundtruths for each image):
+```bash
+bash pipeline_test.sh
+```
 **Note that there are a few parameters that should be set before running this file**:
 -  Multiple models can be evaluated at the same time, they are defined in the models structure where their name has to be defined in the square brackets and the path to their respective weights needs to be specified after the equal sign.
 - The name of the folder hosting the validation set
 - The threshold for removing small clusters through DBSCAN.
-- The up-scaling and down-scaling factors (ideally the one should be inversely proportional to the other)
+- The up-scaling and down-scaling factors (ideally the one should be inversely proportional to the other).
+
+### Ensemble Learning
+
+To create predictions using weighted averages one can use the following bash file:
+```bash
+bash ensemble_learning.sh 
+```
+**Note that there are a few parameters that should be set before running this file**:
+- The variable that specifies whether we are looking at the validation (val) or ther test (test) set
+    - In case of applying on validation specify the name of the validation folder.
+- The models that need to be averaged and their respective weights (no need for the weights to sum up to 1).
+- The binarization threshold.
+- The name of the file that is going to host the results.
 
 ## Make submission
 
-Run the `make_submission.py` script (right now the name of the prediction and resulting file is defined in the script should be given as arguments)
+To create a submission file the following command should be executed:
+```bash
+python utils/make_submission.py ./predictions/test/ submission.csv
+```
 
 > The file containing the predictions should not include any numbers otherwise the resulting submission is going to be wrong.
+<div style="background-color:#a63d40; color:#ffffff; border-left: 5px solid #d9534f; padding: 10px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+    <strong style="font-size: 1em;">Warning!</strong> The file containing the predictions should not include any numbers otherwise the resulting submission is going to be wrong.
+</div>

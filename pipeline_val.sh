@@ -52,18 +52,17 @@ rm -r scaled
 echo "All predictions were generated successfully."
 
 for model_key in "${!models[@]}"
-    do
-        model=${models[$model_key]}
-        echo "Evaluating Model $model_key"
+do
+    model=${models[$model_key]}
+    echo "Evaluating Model $model_key"
 
-        python evaluate.py $val $model_key
+    python evaluate.py $val $model_key
 
-        echo "Performing DBSCAN with threshold $dbscan"
+    echo "Performing DBSCAN with threshold $dbscan"
 
-        python utils/DBSCAN_cleaning.py "./data/${val}/pred/${model_key}" "${model_key}_dbscan${dbscan}" --threshold $dbscan --type 'val'
+    python utils/DBSCAN_cleaning.py "./data/${val}/pred/${model_key}" "${model_key}_dbscan${dbscan}" --threshold $dbscan --type 'val'
 
-        echo "Evaluating Model $model_key (with DBSCAN $dbscan)"
+    echo "Evaluating Model $model_key (with DBSCAN $dbscan)"
 
-        python evaluate.py $val "${model_key}_dbscan${dbscan}"
-
-    done
+    python evaluate.py $val "${model_key}_dbscan${dbscan}"
+done

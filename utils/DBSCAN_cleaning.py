@@ -85,7 +85,7 @@ def main(input_path, output_path, apply_on, size_threshold=500, vizualize=False)
 
     # Subfolder within the predictions directory for DBSCAN processed images
     if apply_on == 'val':
-        prediction_subfolder = os.path.join(base_utils_dir, '..', 'data/val++/pred', output_path)
+        prediction_subfolder = os.path.join(base_utils_dir, '..', 'data/val/pred', output_path)
     if apply_on == 'test':
         prediction_subfolder = os.path.join(base_utils_dir, '..', 'predictions', output_path)
 

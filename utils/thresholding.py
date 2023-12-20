@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, argparse
 from PIL import Image
 import numpy as np
 
@@ -10,7 +10,7 @@ def main(input_path, output_path, apply_on, threshold_value):
     if apply_on == 'test':
         base_dir = os.path.join(os.path.dirname(__file__), '..', 'predictions')
     if apply_on == 'val':
-        base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val++/pred')
+        base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val/pred')
 
     # Directory for the weighted averages
     weighted_avg_dir = os.path.join(base_dir, input_path)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser.add_argument("input_path", type=str, help="Path to the folder containing images.")
     parser.add_argument("output_path", type=str, help="Name of the folder that will host the binary images.")
     parser.add_argument('--type', choices=['test', 'val'], default='pred', help="Are you predicting on the test set or validation set.")
-    parser.add_argument("--threshold", type=int, default=0.5, help="Threshold for classification as a background or road pixel.")
+    parser.add_argument("--threshold", type=float, default=0.5, help="Threshold for classification as a background or road pixel.")
     
     args = parser.parse_args()
     
