@@ -12,9 +12,9 @@ The training directory has to have the following structure:
 ```
 
 >**Warning!** If your ground truths are not binary, you need to binarize them. To do so, use the following command:
-```bash 
-python data/binarize_dir.py
-```
+>```bash 
+>python data/binarize_dir.py
+>```
 >_Note that the directory to be binarized can be adjusted in the script._
 
 
