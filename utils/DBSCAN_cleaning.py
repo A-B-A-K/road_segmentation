@@ -6,7 +6,6 @@ from sklearn.cluster import DBSCAN
 import argparse
 
 def process_image(image_path, size_threshold, output_directory, prediction_subfolder):
-    # Load the image
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     
     # Find all non-zero pixels
@@ -43,12 +42,9 @@ def process_image(image_path, size_threshold, output_directory, prediction_subfo
     image_no_small_clusters = image.copy()
     image_no_small_clusters[mask_small_clusters] = 0
 
-    
-    # Prepare to save the images
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     
-    # Extract filename without extension
     filename_without_ext = os.path.splitext(os.path.basename(image_path))[0]
     
     # Save the image with small clusters removed
@@ -56,7 +52,6 @@ def process_image(image_path, size_threshold, output_directory, prediction_subfo
     cleaned_image_path = os.path.join(prediction_subfolder, cleaned_image_name)
     cv2.imwrite(cleaned_image_path, image_no_small_clusters)
 
-    # Define the plot output path
     plot_output_path = os.path.join(output_directory, f"{filename_without_ext}_plot.png")
     
     # Display the original, colored, and cleaned images side by side
@@ -78,40 +73,43 @@ def process_image(image_path, size_threshold, output_directory, prediction_subfo
     plt.savefig(plot_output_path)
     plt.close()
 
-# To use the function, provide the path to your image and the size threshold as follows:
-# process_image('path_to_your_image.png', your_size_threshold)
-
-def main(folder_path, size_threshold=500):
+def main(input_path, output_path, apply_on, size_threshold=500, vizualize=False):
 
     # Base directory for utils, which is the parent directory of the script's location
     base_utils_dir = os.path.dirname(__file__)
 
-    # Output directory for DBSCAN processed images, relative to the utils directory
-    output_directory = os.path.join(base_utils_dir, '..', 'DBSCAN_process', str(size_threshold))
-    os.makedirs(output_directory, exist_ok=True)
+    # Output directory for DBSCAN processed images
+    if vizualize:
+        output_directory = os.path.join(base_utils_dir, '..', 'DBSCAN_viz', str(size_threshold))
+        os.makedirs(output_directory, exist_ok=True)
 
     # Subfolder within the predictions directory for DBSCAN processed images
-    # prediction_subfolder = os.path.join(base_utils_dir, '..', 'data/val++/pred', 'bright_150_32_-5_DBSCAN500')
-    prediction_subfolder = os.path.join(base_utils_dir, '..', 'predictions', 'hue_best_bs_DB')
+    if apply_on == 'val':
+        prediction_subfolder = os.path.join(base_utils_dir, '..', 'data/val++/pred', output_path)
+    if apply_on == 'test':
+        prediction_subfolder = os.path.join(base_utils_dir, '..', 'predictions', output_path)
+
     os.makedirs(prediction_subfolder, exist_ok=True)
 
-    # Check if the folder exists
     if not os.path.exists(folder_path):
         print(f"The folder {folder_path} does not exist.")
         return
 
     # Iterate over files in the given folder
     for filename in os.listdir(folder_path):
-        if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):  # Check for image files
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
             image_path = os.path.join(folder_path, filename)
             print(f"Processing {filename} with threshold {size_threshold}...")
             process_image(image_path, size_threshold, output_directory, prediction_subfolder)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process images in a folder and remove small clusters.")
-    parser.add_argument("folder_path", type=str, help="Path to the folder containing images.")
+    parser.add_argument("input_path", type=str, help="Path to the folder containing images.")
+    parser.add_argument("output_path", type=str, help="Name of the folder that will host the cleaned images.")
+    parser.add_argument('--type', choices=['test', 'val'], default='pred', help="Are you predicting on the test set or validation set.")
     parser.add_argument("--threshold", type=int, default=500, help="Size threshold for removing small clusters.")
+    parser.add_argument('--viz', action='store_true', help="Visualize the cleaning (result will be stored in a folder called DBSCAN_viz)")
     
     args = parser.parse_args()
     
-    main(args.folder_path, args.threshold)
+    main(args.input_path, args.output_path, args.type, args.threshold, args.viz)

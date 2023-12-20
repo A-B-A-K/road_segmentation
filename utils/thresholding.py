@@ -3,45 +3,40 @@ from PIL import Image
 import numpy as np
 
 def apply_threshold(image_array, threshold=128):
-    # Apply a threshold to the image array
     return (image_array > threshold).astype(np.uint8) * 255
 
-def main(threshold_value):
+def main(input_path, output_path, apply_on, threshold_value):
     # Base directory for predictions, relative to the current working directory of the script
-    base_dir = os.path.join(os.path.dirname(__file__), '..', 'predictions')
-    # base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val++/pred')
+    if apply_on == 'test':
+        base_dir = os.path.join(os.path.dirname(__file__), '..', 'predictions')
+    if apply_on == 'val':
+        base_dir = os.path.join(os.path.dirname(__file__), '..', 'data/val++/pred')
 
     # Directory for the weighted averages
-    weighted_avg_dir = os.path.join(base_dir, 'wa_uneq4_ohcbs_db500')
+    weighted_avg_dir = os.path.join(base_dir, input_path)
 
     # Directory for the binary masks
-    binary_masks_dir = os.path.join(base_dir, f'bin_wa_uneqbestt_ohcbs_db_{threshold_value/256}')
+    binary_masks_dir = os.path.join(base_dir, output_path)
     os.makedirs(binary_masks_dir, exist_ok=True)
 
     # Process each weighted average image
     for image_name in os.listdir(weighted_avg_dir):
-        # Load the weighted average image
         image_path = os.path.join(weighted_avg_dir, image_name)
         image = Image.open(image_path).convert('L')
         image_array = np.array(image)
         
-        # Apply the threshold to create a binary mask
         binary_mask = apply_threshold(image_array, threshold_value)
         
-        # Save the binary mask image
         binary_mask_img = Image.fromarray(binary_mask)
         binary_mask_img.save(os.path.join(binary_masks_dir, image_name))
 
 if __name__ == "__main__":
-    # Accept threshold value as a command-line argument
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <threshold_value>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Threshold weighted average images in order to binarize them.")
+    parser.add_argument("input_path", type=str, help="Path to the folder containing images.")
+    parser.add_argument("output_path", type=str, help="Name of the folder that will host the binary images.")
+    parser.add_argument('--type', choices=['test', 'val'], default='pred', help="Are you predicting on the test set or validation set.")
+    parser.add_argument("--threshold", type=int, default=0.5, help="Threshold for classification as a background or road pixel.")
     
-    try:
-        threshold_value = float(sys.argv[1])
-    except ValueError:
-        print("Threshold value must be a number.")
-        sys.exit(1)
+    args = parser.parse_args()
     
-    main(threshold_value*256)
+    main(args.input_path, args.output_path, args.type, args.threshold*256)
