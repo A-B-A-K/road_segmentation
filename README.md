@@ -15,7 +15,7 @@ The training directory has to have the following structure:
 ```bash 
 python data/binarize_dir.py
 ```
-_Note that the directory to be binarized can be adjusted in the script._
+>_Note that the directory to be binarized can be adjusted in the script._
 
 
 
@@ -119,7 +119,4 @@ To create a submission file the following command should be executed:
 python utils/make_submission.py ./predictions/test/ submission.csv
 ```
 
-> The file containing the predictions should not include any numbers otherwise the resulting submission is going to be wrong.
-<div style="background-color:#a63d40; color:#ffffff; border-left: 5px solid #d9534f; padding: 10px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-    <strong style="font-size: 1em;">Warning!</strong> The file containing the predictions should not include any numbers otherwise the resulting submission is going to be wrong.
-</div>
+> **Warning!** The file containing the predictions should not include any numbers otherwise the resulting submission is going to be wrong.
