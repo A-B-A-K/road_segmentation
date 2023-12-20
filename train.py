@@ -17,8 +17,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 
-# import wandb
-
 from utils.evaluate import evaluate
 from utils.model import UNet
 from utils.leaky_model import LeakyUNet
@@ -47,8 +45,6 @@ else:
     dir_img = Path(f'./data/train/images/')
     dir_mask = Path(f'./data/train/groundtruth/')
 
-# dir_img = Path(f'./data/mit_data/images/')
-# dir_mask = Path(f'./data/mit_data/groundtruth/')
 dir_checkpoint = Path('./checkpoints/')
 
 log_file = open('script_output.log', 'w')
@@ -111,7 +107,7 @@ def train_model(
                               lr=learning_rate, weight_decay=weight_decay, momentum=momentum, foreach=True)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=5)  # goal: maximize Dice score
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
-    criterion = nn.CrossEntropyLoss() # if model.n_classes > 1 else nn.BCEWithLogitsLoss()    # Change to the 2 class version only
+    criterion = nn.CrossEntropyLoss()
     global_step = 0
     
     train_losses = []
@@ -172,18 +168,16 @@ def train_model(
                             image_tensor = (image_tensor + 1)/2
                         image_tensor = image_tensor.astype(np.float32)
                         image_tensor = (image_tensor * 255).clip(0, 255).astype(np.uint8)
-                        print("shape of it: ", image_tensor.shape)
 
-                        # # For the true mask - directly converting to numpy array, as it is 2D
+                        # For the true mask - directly converting to numpy array, as it is 2D
                         true_mask_tensor = true_masks[0].float().cpu().numpy().astype(np.uint8)
 
                         true_mask_tensor = true_masks[0]
 
-                        # # For the predicted mask - directly converting to numpy array, as it is 2D
+                        # For the predicted mask - directly converting to numpy array, as it is 2D
                         pred_mask_tensor = masks_pred.argmax(dim=1)[0].float().cpu().numpy().astype(np.uint8)
 
                         pred_mask_tensor = masks_pred.argmax(dim=1)[0]
-                        # check_and_save_mask(pred_mask_tensor, f'images/pred_maskwow_{global_step}_{learning_rate}.png')
             train_loss = epoch_loss / n_train
             train_losses.append(train_loss)
 
