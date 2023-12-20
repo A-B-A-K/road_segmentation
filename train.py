@@ -229,8 +229,9 @@ def get_args():
     parser.add_argument('--amp', action='store_true', default=False, help='Use mixed precision')
     parser.add_argument('--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
     parser.add_argument('--classes', '-c', type=int, default=2, help='Number of classes')
-    parser.add_argument('--leaky', action='store_true', default=False, help='Use leaky ReLU')
-    parser.add_argument('--dataset', type=str, default='original', help='Type of image transformation to apply')
+    parser.add_argument('--leaky', action='store_true', default=False, help='Use leaky ReLU instead of normal ReLU')
+    # parser.add_argument('--transform', type=int, default=0, 
+    #                     help='Which transform is used in this run 0; original, 1: hue, 2: contrast, 3: brightness, 4: saturation')
 
     return parser.parse_args()
 

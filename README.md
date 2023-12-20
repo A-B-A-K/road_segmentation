@@ -2,14 +2,27 @@
 
 ## Setup
 
-The training and testing data we use is in the `data`. 
+The training and testing data we use is located in the `data` directory. 
 
-The training directory (in our case `training_augmented`, we will talk about the augmentation later) has to have the following structure:
+The training directory has to have the following structure:
 ```bash
 /training_set
     /ground_truth
     /images
 ```
+
+<div style="background-color:#a63d40; color:#ffffff; border-left: 5px solid #d9534f; padding: 10px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+    <strong style="font-size: 1em;">Warning!</strong> If your ground truths are not binary, you need to binarize them. To do so, use the following command:
+    <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 5px; border-radius: 3px; font-family: 'Courier New', Courier, monospace;">
+        python data/binarize_dir.py
+    </div>
+    <i>Note that the directory to be binarized can be adjusted in the script.</i>
+</div>
+
+
+
+
+
 The test directory (in our case `test_set_images`) has to have the following structure:
 ```bash
 /test_set
@@ -17,15 +30,54 @@ The test directory (in our case `test_set_images`) has to have the following str
         test_i.png
 ```
 
+
+
+There is the possibility to split the data into training and validation, augment the data and generate variants of the original dataset, namely hue, contrast, saturation and brightness (used in our pipeline to refine our predictions through ensemble learning).
+
+### Split data
+```bash
+python data/split_data.py --ratio 0.9
+```
+_Note that the names of the input and output directories can be adjusted through the script, and that the split ratio has a default value of 0.9._
+
+### Data augmentation:
+```bash
+python data/augment_data.py
+```
+_Note that the names of the input and output directories can be adjusted through the script_
+
+### Transform data
+```bash
+python data/transform_data.py
+```
+_Note that the names of the input and output directories can be adjusted through the script_
+
 ## Training
 
-To perform the training the following line of code has to be run:
+In oreder to train a single model the following command can be run:
 ```bash
-python train.py --amp
+python train.py 
 ```
-Additional flags:
-- `--epochs $num_epochs`
-- `--learning-rate $lr`
+Interesting flags:
+- `--epochs`: Number of epochs
+- `--batch-size`: Batch size
+- `--learning-rate`: Learning rate
+- `--leaky`: Use leaky ReLU instead of normal ReLU
+- `--load`: Load model from a .pth file
+- `--amp`: Use mixed precision
+
+The recommended setup to use is the following:
+```bash
+python train.py --amp --epochs 150 --batch-size 32 --learning-rate 1e-5 
+```
+The paths for the images and groundtruths can be defined in the top of the training file (a preset structure to enhance user experience has been setup and can be commented out).
+
+An alternative that can be used in a similar way, that runs a set of transformed datasets in a cascaded way is:
+```bash
+python train_loop.py --amp --epochs 150 --batch-size 32 --learning-rate 1e-5 
+```
+
+The resulting weights will be stored in the checkpoints folder. Ideally the weights of intereset should be moved to a new weights folder.
 
 ## Testing
 
@@ -36,14 +88,15 @@ Test single image (no image partition):
 python predict.py -i image.jpg -o output.jpg
 ```
 
-Test on multiple images (with image partition):
+To evaluate the performance of the validation set the following bash file should be run:
 ```bash
-bash pipeline.sh
+bash pipeline_val.sh
 ```
-**Note**: 
-- The order of the partitionning can be chosen in the `pipeline.sh` file by changing the `order` variable. 
-- The model tested can also be chosen by changing the `model` variable.
-- The name of the prediction file can be chosen through the `predict_output` variable (The result can be found in the `predictions` directory).
+**Note that there are a few parameters that should be set before running this file**:
+-  Multiple models can be evaluated at the same time, they are defined in the models structure where their name has to be defined in the square brackets and the path to their respective weights needs to be specified after the equal sign.
+- The name of the folder hosting the validation set
+- The threshold for removing small clusters through DBSCAN.
+- The up-scaling and down-scaling factors (ideally the one should be inversely proportional to the other)
 
 ## Make submission
 

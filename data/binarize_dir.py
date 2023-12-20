@@ -1,7 +1,7 @@
 import os
 from PIL import Image
 
-directory_path = './data/training++/groundtruth/'
+directory_path = './data/training/groundtruth/'
 
 # Iterate over each file in the directory
 for filename in os.listdir(directory_path):

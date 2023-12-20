@@ -63,6 +63,8 @@ def get_args():
                         help='Scale factor for the input images')
     parser.add_argument('--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
     parser.add_argument('--classes', '-c', type=int, default=2, help='Number of classes')
+    parser.add_argument('--leaky', action='store_true', default=False, help='Use leaky ReLU')
+    parser.add_argument('--verbose', action='store_true', default=False, help='Descriptive execution of the program')
     
     return parser.parse_args()
 
@@ -98,24 +100,27 @@ if __name__ == '__main__':
     in_files = args.input
     out_files = get_output_filenames(args)
 
-    if leaky:
+    if args.leaky:
         net = LeakyUNet(n_channels=3, n_classes=args.classes, bilinear=args.bilinear)
     else:  
         net = UNet(n_channels=3, n_classes=args.classes, bilinear=args.bilinear)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    logging.info(f'Loading model {args.model}')
-    logging.info(f'Using device {device}')
+    if args.verbose:
+        logging.info(f'Loading model {args.model}')
+        logging.info(f'Using device {device}')
 
     net.to(device=device)
     state_dict = torch.load(args.model, map_location=device)
     mask_values = state_dict.pop('mask_values', [0, 1])
     net.load_state_dict(state_dict)
 
-    logging.info('Model loaded!')
+    if args.verbose:
+        logging.info('Model loaded!')
 
     for i, filename in enumerate(in_files):
-        logging.info(f'Predicting image {filename} ...')
+        if args.verbose:
+            logging.info(f'Predicting image {filename} ...')
         img = Image.open(filename)
 
         mask = predict_img(net=net,
@@ -134,11 +139,10 @@ if __name__ == '__main__':
             bw_img = grayscale_img.point(lambda x : 0 if x < 128 else 255, '1')
             bw_img.save(out_filename)
 
-
-            
-            # result.save(out_filename)
-            logging.info(f'Mask saved to {out_filename}')
+            if args.verbose:
+                logging.info(f'Mask saved to {out_filename}')
 
         if args.viz:
-            logging.info(f'Visualizing results for image {filename}, close to continue...')
+            if args.verbose:
+                logging.info(f'Visualizing results for image {filename}, close to continue...')
             plot_img_and_mask(img, mask)

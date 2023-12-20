@@ -25,11 +25,6 @@ from utils.dice_score import dice_loss
 
 transforms = ['original', 'hue', 'contrast', 'brightness', 'saturation']
 
-# transformation = transf[0]
-leaky       = False
-augmented   = True
-transformed = True
-
 datasets = {
     'original': {
         'images': Path('./data/train_aug++_transf/train_original/images/'),
@@ -58,20 +53,9 @@ datasets = {
 }
 
 
+dir_img = Path(f'./data/training/images/')
+dir_mask = Path(f'./data/training/groundtruth/')
 
-# if augmented:
-#     if transformed:
-#         dir_img = Path(f'./data/train_aug_transf/train_{transformation}/images/')
-#         dir_mask = Path(f'./data/train_aug_transf/train_{transformation}/groundtruth/')    
-#     else:
-#         dir_img = Path(f'./data/train_aug/images/')
-#         dir_mask = Path(f'./data/train_aug/groundtruth/')   
-# else:
-#     dir_img = Path(f'./data/train/images/')
-#     dir_mask = Path(f'./data/train/groundtruth/')
-
-dir_img = Path(f'./data/mit_data/images/')
-dir_mask = Path(f'./data/mit_data/groundtruth/')
 dir_checkpoint = Path('./checkpoints/')
 
 log_file = open('script_output.log', 'w')

@@ -79,9 +79,9 @@ def main(input_path, output_path, apply_on, size_threshold=500, vizualize=False)
     base_utils_dir = os.path.dirname(__file__)
 
     # Output directory for DBSCAN processed images
-    if vizualize:
-        output_directory = os.path.join(base_utils_dir, '..', 'DBSCAN_viz', str(size_threshold))
-        os.makedirs(output_directory, exist_ok=True)
+    
+    output_directory = os.path.join(base_utils_dir, '..', 'DBSCAN_viz', str(size_threshold))
+    os.makedirs(output_directory, exist_ok=True)
 
     # Subfolder within the predictions directory for DBSCAN processed images
     if apply_on == 'val':
@@ -91,15 +91,16 @@ def main(input_path, output_path, apply_on, size_threshold=500, vizualize=False)
 
     os.makedirs(prediction_subfolder, exist_ok=True)
 
-    if not os.path.exists(folder_path):
-        print(f"The folder {folder_path} does not exist.")
+    if not os.path.exists(input_path):
+        print(f"The folder {input_path} does not exist.")
         return
 
     # Iterate over files in the given folder
-    for filename in os.listdir(folder_path):
+    for filename in os.listdir(input_path):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
-            image_path = os.path.join(folder_path, filename)
-            print(f"Processing {filename} with threshold {size_threshold}...")
+            image_path = os.path.join(input_path, filename)
+            # print(f"Processing {filename} with threshold {size_threshold}...")
+            
             process_image(image_path, size_threshold, output_directory, prediction_subfolder)
 
 if __name__ == "__main__":
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     parser.add_argument("output_path", type=str, help="Name of the folder that will host the cleaned images.")
     parser.add_argument('--type', choices=['test', 'val'], default='pred', help="Are you predicting on the test set or validation set.")
     parser.add_argument("--threshold", type=int, default=500, help="Size threshold for removing small clusters.")
-    parser.add_argument('--viz', action='store_true', help="Visualize the cleaning (result will be stored in a folder called DBSCAN_viz)")
+    parser.add_argument('--viz', action='store_true', default=False, help="Visualize the cleaning (result will be stored in a folder called DBSCAN_viz)")
     
     args = parser.parse_args()
     

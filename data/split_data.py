@@ -7,10 +7,10 @@ def split_data(base_path, split_ratio):
     print("Starting the data splitting process...")
 
     # Directories
-    images_dir = os.path.join(base_path, 'training++/images')
-    groundtruth_dir = os.path.join(base_path, 'training++/groundtruth')
-    train_dir = os.path.join(base_path, 'train++')
-    val_dir = os.path.join(base_path, 'val++')
+    images_dir = os.path.join(base_path, 'training/images')
+    groundtruth_dir = os.path.join(base_path, 'training/groundtruth')
+    train_dir = os.path.join(base_path, 'train')
+    val_dir = os.path.join(base_path, 'val')
 
     # Create train and val directories if they don't exist
     for directory in [train_dir, val_dir]:
